@@ -74,7 +74,7 @@ public class Robot extends IterativeRobot {
 					nextActionTime = System.currentTimeMillis() + 2000;
 				}
 			}
-			if (nextAutoAction == "Step 5") {
+			if (nextAutoAction == "Step 4") {
 				if (System.currentTimeMillis() < nextActionTime) {
 					myRobot.drive(0.0, 0.0);
 				} else {
