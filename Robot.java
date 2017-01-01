@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import java.lang.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -16,6 +17,10 @@ public class Robot extends IterativeRobot {
 	RobotDrive myRobot;
 	Joystick stick;
 	int autoLoopCounter;
+	int autoLoopCounter2;
+	long autoMillisCounter;
+	String nextAutoAction;
+	long nextActionTime;
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -34,20 +39,51 @@ public class Robot extends IterativeRobot {
      */
     public void autonomousInit() {
     	autoLoopCounter = 0;
+    	autoLoopCounter2 = 0;
+    	autoMillisCounter = System.currentTimeMillis();
+    	nextAutoAction = "Step 1";
+    	nextActionTime = System.currentTimeMillis() + 2000;
     }
 
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    	if(autoLoopCounter < 100) //Check if we've completed 100 loops (approximately 2 seconds)
-		{
-			myRobot.drive(-0.5, 0.0); 	// drive forwards half speed
-			autoLoopCounter++;
-			} else {
-			myRobot.drive(0.0, 0.0); 	// stop robot
-		}
-    }
+			if (nextAutoAction == "Step 1") {
+				if (System.currentTimeMillis() < nextActionTime) {
+					myRobot.drive(-1.0, 0.0);
+				} else {
+					nextAutoAction = "Step 2";
+					nextActionTime = System.currentTimeMillis() + 2000;
+				}
+			}
+			
+			if (nextAutoAction == "Step 2") {
+				if (System.currentTimeMillis() < nextActionTime) {
+					myRobot.drive(0.0, 0.0);
+				} else {
+					nextAutoAction = "Step 3";
+					nextActionTime = System.currentTimeMillis() + 2000;
+				}
+			}
+			if (nextAutoAction == "Step 3") {
+				if (System.currentTimeMillis() < nextActionTime) {
+					myRobot.drive(1.0, 0.0);
+				} else {
+					nextAutoAction = "Step 4";
+					nextActionTime = System.currentTimeMillis() + 2000;
+				}
+			}
+			if (nextAutoAction == "Step 5") {
+				if (System.currentTimeMillis() < nextActionTime) {
+					myRobot.drive(0.0, 0.0);
+				} else {
+					nextAutoAction = "Step 5";
+					nextActionTime = System.currentTimeMillis() + 2000;
+				}
+			}
+	    }
+    
     
     /**
      * This function is called once each time the robot enters tele-operated mode
