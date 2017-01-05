@@ -3,7 +3,6 @@ package org.usfirst.frc.team6131.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import java.lang.*;
 
@@ -22,17 +21,13 @@ public class Robot extends IterativeRobot {
 	long autoMillisCounter;
 	String nextAutoAction;
 	long nextActionTime;
-	VictorSP leftmotor;
-	VictorSP rightmotor;
 	
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
-    	leftmotor = new VictorSP(0);
-    	rightmotor = new VictorSP(3);
-    	myRobot = new RobotDrive(leftmotor,rightmotor);
+    	myRobot = new RobotDrive(0,1);
     	stick = new Joystick(0);
     	
     	
