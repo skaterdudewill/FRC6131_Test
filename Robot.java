@@ -20,8 +20,6 @@ public class Robot extends IterativeRobot {
 	// which PWMs are the drive motors connected to?
 	int driveLeftPWM=1;
 	int driveRightPWM=0;
-	double drivex;
-	double drivey;
 	
 	// which joystick will drive the robot?
 	int driveJoystick=0;
@@ -33,6 +31,10 @@ public class Robot extends IterativeRobot {
 	// which xbox buttons will control the drive multiplier up/down?
 	int multUpButton=6;
 	int multDnButton=5;
+	
+	// to reverse the values of an axis, set its swap value to -1 below. otherwise, leave it at 1
+	int driveYAxisSwap=-1;
+	int driveXAxisSwap=-1;
 	
 	// variables used for drive multiplier adjustments
 	boolean multUpButtonState;
@@ -145,7 +147,7 @@ public class Robot extends IterativeRobot {
     		} else {
     			// button was not pushed, it's still not pushed
     		}
-	}    		  
+		}    		  
     	
     	if (multDnButtonState==true){
     		// button was pushed
@@ -164,7 +166,7 @@ public class Robot extends IterativeRobot {
     		} else {
     			// button was not pushed, it's still not pushed
     		}
-	}  
+		}  
     	
     	if (driveMultiplier > maxDriveMultiplier) driveMultiplier = maxDriveMultiplier;
     	if (driveMultiplier < minDriveMultiplier) driveMultiplier = minDriveMultiplier;
@@ -176,8 +178,8 @@ public class Robot extends IterativeRobot {
         }
         */
 		
-    	drivey= (stick.getRawAxis(driveYAxis) * -1) * driveMultiplier;
-        drivex = (stick.getRawAxis(driveXAxis) * -1)  * driveMultiplier;
+    	double drivey= (stick.getRawAxis(driveYAxis) * driveYAxisSwap) * driveMultiplier;
+        double drivex = (stick.getRawAxis(driveXAxis) * driveYAxisSwap) * driveMultiplier;
     	myRobot.arcadeDrive(drivey, drivex, true);
     	
     	// Original Drive
