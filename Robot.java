@@ -75,40 +75,40 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-			if (nextAutoAction == "Step 1") {
-				if (System.currentTimeMillis() < nextActionTime) {
-					myRobot.drive(-1.0, 0.0);
-				} else {
-					nextAutoAction = "Step 2";
+		if (nextAutoAction == "Step 1") {
+			if (System.currentTimeMillis() < nextActionTime) {
+				myRobot.drive(-1.0, 0.0);
+			} else {
+				nextAutoAction = "Step 2";
+				nextActionTime = System.currentTimeMillis() + 2000;
+			}
+		}
+		
+		if (nextAutoAction == "Step 2") {
+			if (System.currentTimeMillis() < nextActionTime) {
+				myRobot.drive(0.0, 0.0);
+			} else {
+				nextAutoAction = "Step 3";
+				nextActionTime = System.currentTimeMillis() + 2000;
+			}
+		}
+		if (nextAutoAction == "Step 3") {
+			if (System.currentTimeMillis() < nextActionTime) {
+				myRobot.drive(1.0, 0.0);
+			} else {
+				nextAutoAction = "Step 4";
+				nextActionTime = System.currentTimeMillis() + 2000;
+			}
+		}
+		if (nextAutoAction == "Step 4") {
+			if (System.currentTimeMillis() < nextActionTime) {
+				myRobot.drive(0.0, 0.0);
+			} else {
+				nextAutoAction = "Step 5";
 					nextActionTime = System.currentTimeMillis() + 2000;
 				}
 			}
-			
-			if (nextAutoAction == "Step 2") {
-				if (System.currentTimeMillis() < nextActionTime) {
-					myRobot.drive(0.0, 0.0);
-				} else {
-					nextAutoAction = "Step 3";
-					nextActionTime = System.currentTimeMillis() + 2000;
-				}
-			}
-			if (nextAutoAction == "Step 3") {
-				if (System.currentTimeMillis() < nextActionTime) {
-					myRobot.drive(1.0, 0.0);
-				} else {
-					nextAutoAction = "Step 4";
-					nextActionTime = System.currentTimeMillis() + 2000;
-				}
-			}
-			if (nextAutoAction == "Step 4") {
-				if (System.currentTimeMillis() < nextActionTime) {
-					myRobot.drive(0.0, 0.0);
-				} else {
-					nextAutoAction = "Step 5";
-					nextActionTime = System.currentTimeMillis() + 2000;
-				}
-			}
-	    }
+		}
     
     
     /**
@@ -145,7 +145,7 @@ public class Robot extends IterativeRobot {
     		} else {
     			// button was not pushed, it's still not pushed
     		}
-		}    		  
+	}    		  
     	
     	if (multDnButtonState==true){
     		// button was pushed
@@ -164,7 +164,7 @@ public class Robot extends IterativeRobot {
     		} else {
     			// button was not pushed, it's still not pushed
     		}
-		}  
+	}  
     	
     	if (driveMultiplier > maxDriveMultiplier) driveMultiplier = maxDriveMultiplier;
     	if (driveMultiplier < minDriveMultiplier) driveMultiplier = minDriveMultiplier;
