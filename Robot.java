@@ -3,6 +3,9 @@ package org.usfirst.frc.team6131.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import java.lang.*;
 
@@ -45,6 +48,15 @@ public class Robot extends IterativeRobot {
 	double minDriveMultiplier=0.4;
 	double maxDriveMultiplier=1.0;
 	
+	// PWM for the fuel picker uper motor
+	int fuelPWM = 2;
+	
+	// button for the fuel pickup motor to run while pressed
+	boolean fuelButton = false;
+	
+	// Robot drive for the front motor
+	private SpeedController fuelMotor;
+	
 	RobotDrive myRobot;
 	Joystick stick;
 	
@@ -59,7 +71,7 @@ public class Robot extends IterativeRobot {
      */
     public void robotInit() {
 
-    	
+    	fuelMotor = new Spark(fuelPWM);
     	myRobot = new RobotDrive(driveLeftPWM, driveRightPWM);
     	stick = new Joystick(driveJoystick);
     }
@@ -171,12 +183,14 @@ public class Robot extends IterativeRobot {
     	if (driveMultiplier > maxDriveMultiplier) driveMultiplier = maxDriveMultiplier;
     	if (driveMultiplier < minDriveMultiplier) driveMultiplier = minDriveMultiplier;
     	
-    	/*
-    	boolean button = stick.getRawButton(1);
-        if (button == true) {
-        	myRobot.drive(1, 0.0);
+    	
+    	boolean fuelButton = stick.getRawButton(1);
+        if (fuelButton == true) {
+        	fuelMotor.set(1.0);
+        } else {
+        	fuelMotor.set(0.0);
         }
-        */
+        
 		
     	double drivey= (stick.getRawAxis(driveYAxis) * driveYAxisSwap) * driveMultiplier;
         double drivex = (stick.getRawAxis(driveXAxis) * driveYAxisSwap) * driveMultiplier;
