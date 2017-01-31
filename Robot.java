@@ -1,7 +1,7 @@
 	package org.usfirst.frc.team6131.robot;
 	
 	import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.IterativeRobot;
+	import edu.wpi.first.wpilibj.IterativeRobot;
 	import edu.wpi.first.wpilibj.Joystick;
 	import edu.wpi.first.wpilibj.RobotDrive;
 	import edu.wpi.first.wpilibj.Spark;
@@ -53,8 +53,8 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 		int trayMotorPWM;
 		
 		// Buttons for tray motors
-    	boolean trayButtonUp;
-    	boolean trayButtonDown;
+    		boolean trayButtonUp;
+    		boolean trayButtonDown;
 
 		// button for the fuel pickup motor to run while pressed
 		boolean fuelButton = false;
