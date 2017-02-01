@@ -53,11 +53,8 @@
 		int trayMotorPWM;
 		
 		// Buttons for tray motors
-    		boolean trayButtonUp;
-    		boolean trayButtonDown;
-
-		// button for the fuel pickup motor to run while pressed
-		boolean fuelButton = false;
+    	boolean trayButtonUp = false;
+    	boolean trayButtonDown = false;
 		
 		// Robot drive for the limit switch motor;
 		private SpeedController trayMotor;
@@ -85,10 +82,7 @@
 	    	// setup tray limit switches
 	    	trayLimitUp = new DigitalInput(0);
 	    	trayLimitDown = new DigitalInput(1);
-	    	
-	    	// setup tray motor buttons
-	    	trayButtonUp = stick.getRawButton(3);
-	    	trayButtonDown = stick.getRawButton(2);
+
 	    	
 	    	// setup pwm for limit switch motor
 	    	trayMotorPWM = 2;
@@ -151,6 +145,9 @@
 	     * This function is called once each time the robot enters tele-operated mode
 	     */
 	    public void teleopInit(){
+	    	
+	    	
+	    	
 	        driveMultiplier=minDriveMultiplier;
 	        multUpButtonState=false;
 	    }
@@ -159,6 +156,9 @@
 	     * This function is called periodically during operator control
 	     */
 	    public void teleopPeriodic() {
+	    	// setup tray motor buttons
+	    	trayButtonUp = stick.getRawButton(3);
+	    	trayButtonDown = stick.getRawButton(2);
 	    	
 	    	// get values for the drive multiplier up/down buttons
 	    	boolean multUpValue=stick.getRawButton(multUpButton);
@@ -204,32 +204,34 @@
 	    	
 	    	if (driveMultiplier > maxDriveMultiplier) driveMultiplier = maxDriveMultiplier;
 	    	if (driveMultiplier < minDriveMultiplier) driveMultiplier = minDriveMultiplier;
-	    	
+
 	    	// see if the tray limit switches are closed
 	    	if (trayLimitUp.get()){
-	    		trayLimitUpPressed=true;
-	    	} else {
 	    		trayLimitUpPressed=false;
+	    	} else {
+	    		trayLimitUpPressed=true;
 	    	}
 	    	
 	    	if (trayLimitDown.get()){
-	    		trayLimitDownPressed=true;
-	    	} else {
 	    		trayLimitDownPressed=false;
+	    	} else {
+	    		trayLimitDownPressed=true;
 	    	}
 	    	
-	        if (trayButtonUp == true && trayLimitUpPressed==false) {
-	        	trayMotor.set(1.0);
-	        } else {
-	        	trayMotor.set(0.0);
-	        }
-	        
-	        if (trayButtonDown == true && trayLimitDownPressed==false) {
-	        	trayMotor.set(-1.0);
-	        } else {
-	        	trayMotor.set(0.0);
-	        }     
-	        
+	    	if (trayButtonUp == true || trayButtonDown == true) {
+	    		// a button is pushed
+	    		if (trayButtonUp == true && trayLimitUpPressed == false) {
+	    			//Safe to go up
+	    			trayMotor.set(0.5);
+	    		} else if(trayButtonDown == true && trayLimitDownPressed==false) {
+	    			trayMotor.set(-0.5);
+	    		} else {
+	    			trayMotor.set(0.0);
+	    		}
+	    	} else {
+	    		trayMotor.set(0.0);
+	    	}
+	            
 			
 	    	double drivey= (stick.getRawAxis(driveYAxis) * driveYAxisSwap) * driveMultiplier;
 	        double drivex = (stick.getRawAxis(driveXAxis) * driveYAxisSwap) * driveMultiplier;
