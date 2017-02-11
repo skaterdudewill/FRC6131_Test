@@ -9,6 +9,9 @@
 	import edu.wpi.first.wpilibj.Talon;
 	import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 	import java.lang.*;
+	import edu.wpi.first.wpilibj.CameraServer;
+	import edu.wpi.first.wpilibj.SampleRobot;
+	import edu.wpi.first.wpilibj.Timer;
 	
 	/**
 	 * The VM is configured to automatically run this class, and to call the
@@ -73,11 +76,27 @@
 		String nextAutoAction;
 		long nextActionTime;
 		
+		// Setup camera variables
+		CameraServer server;
+		
+		// Setting up tray button re-press tracker
+		boolean trayButtonStillPressed;
+		
+		// Set up tray motor speed
+		double trayMotorUpSpeed;
+		double trayMotorDownSpeed;
+		
 	    /**
 	     * This function is run when the robot is first started up and should be
 	     * used for any initialization code.
 	     */
 	    public void robotInit() {
+	    	// setup camera
+	    	server = CameraServer.getInstance();
+	    	server.setQuality(50);
+	    	// Camera server name in web interface
+	    	server.startAutomaticCapture("cam0");
+	    	server.setSize(640);
 	    	
 	    	// setup tray limit switches
 	    	trayLimitUp = new DigitalInput(0);
@@ -145,11 +164,10 @@
 	     * This function is called once each time the robot enters tele-operated mode
 	     */
 	    public void teleopInit(){
-	    	
-	    	
-	    	
 	        driveMultiplier=minDriveMultiplier;
 	        multUpButtonState=false;
+	        trayMotorUpSpeed = 1.0;
+	        trayMotorDownSpeed = 0.7;
 	    }
 	
 	    /**
@@ -210,6 +228,7 @@
 	    		trayLimitUpPressed=false;
 	    	} else {
 	    		trayLimitUpPressed=true;
+	    		trayButtonStillPressed = true;
 	    	}
 	    	
 	    	if (trayLimitDown.get()){
@@ -222,14 +241,19 @@
 	    		// a button is pushed
 	    		if (trayButtonUp == true && trayLimitUpPressed == false) {
 	    			//Safe to go up
-	    			trayMotor.set(0.5);
+	    			if (trayButtonStillPressed == true ) {
+	    				// but don't go up until the button is re-pressed
+	    			} else {
+	    				trayMotor.set(trayMotorUpSpeed);
+	    			}
 	    		} else if(trayButtonDown == true && trayLimitDownPressed==false) {
-	    			trayMotor.set(-0.5);
+	    			trayMotor.set(-1 * trayMotorDownSpeed);
 	    		} else {
 	    			trayMotor.set(0.0);
 	    		}
 	    	} else {
 	    		trayMotor.set(0.0);
+	    		trayButtonStillPressed = false;
 	    	}
 	            
 			
