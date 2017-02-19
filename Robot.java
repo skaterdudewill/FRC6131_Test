@@ -1,5 +1,5 @@
-	package org.usfirst.frc.team6131.robot;
-	
+package org.usfirst.frc.team6131.robot;
+
 	import edu.wpi.first.wpilibj.DigitalInput;
 	import edu.wpi.first.wpilibj.IterativeRobot;
 	import edu.wpi.first.wpilibj.Joystick;
@@ -8,9 +8,12 @@
 	import edu.wpi.first.wpilibj.SpeedController;
 	import edu.wpi.first.wpilibj.Talon;
 	import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-	import java.lang.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.lang.*;
 	import edu.wpi.first.wpilibj.CameraServer;
 	import edu.wpi.first.wpilibj.SampleRobot;
+	import edu.wpi.first.wpilibj.Servo;
 	import edu.wpi.first.wpilibj.Timer;
 	
 	/**
@@ -35,6 +38,32 @@
 		int driveYAxis=5;
 		int driveXAxis=4;
 		
+		// camera axes
+		int cameraYAxis=1;
+		int cameraXAxis=0;
+		
+		// Camera PWMS
+		int cameraYPWM = 3;
+		int cameraXPWM = 4;
+		
+		// Camera Servo
+		Servo cameraYServo = new Servo(cameraYPWM);
+		Servo cameraXServo = new Servo(cameraXPWM);
+		
+		// Keep up with the Y Angle
+		int cameraYAngle;
+		int cameraXAngle;
+		
+		// Min-Maxes for Camera Angle
+		int cameraYMax = 170;
+		int cameraYMin = 0;
+		int cameraXMax = 170;
+		int cameraXMin = 0;
+		
+		// 
+		int cameraXMultiplier = 2;
+		int cameraYMultiplier = 2;
+		
 		// which xbox buttons will control the drive multiplier up/down?
 		int multUpButton=6;
 		int multDnButton=5;
@@ -57,10 +86,13 @@
 		
 		// Buttons for tray motors
     	boolean trayButtonUp = false;
-    	boolean trayButtonDown = false;
+        boolean trayButtonDown = false;
+        int trayButtonUpController = 2;
+        int trayButtonDownController = 3;
 		
 		// Robot drive for the limit switch motor;
 		private SpeedController trayMotor;
+		
 		
 		RobotDrive myRobot;
 		Joystick stick;
@@ -76,6 +108,19 @@
 		String nextAutoAction;
 		long nextActionTime;
 		
+		// Gear step variables, and time-for-next-step variables
+		long gearMillisCounter;
+		String nextGearAction;
+		long nextGearActionTime;
+		int gearButtonController = 1;
+		boolean gearButton = false;
+		int gearPWM = 5;
+		Servo gearServo = new Servo(gearPWM);
+		int gearAngle;
+		int gearAngleMin = 0;
+		int gearAngleMax = 170;
+		long gearStep2Time = 1000;
+		
 		// Setup camera variables
 		CameraServer server;
 		
@@ -85,7 +130,6 @@
 		// Set up tray motor speed
 		double trayMotorUpSpeed;
 		double trayMotorDownSpeed;
-		
 	    /**
 	     * This function is run when the robot is first started up and should be
 	     * used for any initialization code.
@@ -106,9 +150,19 @@
 	    	// setup pwm for limit switch motor
 	    	trayMotorPWM = 2;
 	    	
+	    	
 	    	trayMotor = new Spark(trayMotorPWM);
 	    	myRobot = new RobotDrive(driveLeftPWM, driveRightPWM);
 	    	stick = new Joystick(driveJoystick);
+	    	
+	    	cameraYAngle = 90;
+	    	cameraYServo.setAngle(cameraYAngle);
+	    	
+	    	cameraXAngle = 90;
+	    	cameraXServo.setAngle(cameraXAngle);
+	    	
+	    	gearAngle = gearAngleMin;
+	    	gearServo.setAngle(gearAngle);
 	    }
 	    
 	    /**
@@ -168,6 +222,11 @@
 	        multUpButtonState=false;
 	        trayMotorUpSpeed = 1.0;
 	        trayMotorDownSpeed = 0.7;
+	        // Gear Servo Setup
+	        gearMillisCounter = System.currentTimeMillis();
+	    	nextGearAction = "Step 1";
+	    	nextGearActionTime = System.currentTimeMillis() + 2000;
+	        
 	    }
 	
 	    /**
@@ -175,8 +234,8 @@
 	     */
 	    public void teleopPeriodic() {
 	    	// setup tray motor buttons
-	    	trayButtonUp = stick.getRawButton(3);
-	    	trayButtonDown = stick.getRawButton(2);
+	    	trayButtonUp = stick.getRawButton(trayButtonDownController);
+	    	trayButtonDown = stick.getRawButton(trayButtonUpController);
 	    	
 	    	// get values for the drive multiplier up/down buttons
 	    	boolean multUpValue=stick.getRawButton(multUpButton);
@@ -255,15 +314,74 @@
 	    		trayMotor.set(0.0);
 	    		trayButtonStillPressed = false;
 	    	}
-	            
-			
+	    	
+	    	// Grab Camera Joystick Values
+	        double camerajsy= (stick.getRawAxis(cameraYAxis));
+	        SmartDashboard.putNumber("Joystick Value", camerajsy);
+	    	if (camerajsy > 0.5) {
+	    		// Move the camera up
+	    		cameraYAngle += cameraYMultiplier;
+	    		if (cameraYAngle > cameraYMax) {
+	    			cameraYAngle = cameraYMax;
+	    		}
+	    		cameraYServo.setAngle(cameraYAngle);
+	    	} else if (camerajsy < -0.5) {
+	    		// Move the camera up
+	    		cameraYAngle -= cameraYMultiplier;
+	    		if (cameraYAngle < cameraYMin) {
+	    			cameraYAngle = cameraYMin;
+	    		}
+	    		cameraYServo.setAngle(cameraYAngle);
+	    	}
+	    	
+	        double camerajsx = (stick.getRawAxis(cameraXAxis));	    
+	    	if (camerajsx > 0.5) {
+	    		// Move the camera up
+	    		cameraXAngle += cameraXMultiplier;
+	    		if (cameraXAngle > cameraXMax) {
+	    			cameraXAngle = cameraXMax;
+	    		}
+	    		cameraXServo.setAngle(cameraXAngle);
+	    	} else if (camerajsx < -0.5) {
+	    		// Move the camera up
+	    		cameraXAngle -= cameraXMultiplier;
+	    		if (cameraXAngle < cameraXMin) {
+	    			cameraXAngle = cameraXMin;
+	    		}
+	    		cameraXServo.setAngle(cameraXAngle);
+	    	}
+	       
+	    	// Right joystick drive
 	    	double drivey= (stick.getRawAxis(driveYAxis) * driveYAxisSwap) * driveMultiplier;
 	        double drivex = (stick.getRawAxis(driveXAxis) * driveYAxisSwap) * driveMultiplier;
 	    	myRobot.arcadeDrive(drivey, drivex, true);
 	    	
-	    	// Original Drive
-	        // myRobot.arcadeDrive(stick, 5, stick, 4, true);
-	    	
+	    	// perform gear actions
+	    	gearButton = stick.getRawButton(gearButtonController);
+
+	    	if (nextGearAction == "Step 1") {
+	    		if (gearButton) {
+	    			// Button was pushed  			
+					nextAutoAction = "Step 2";
+				}
+			}
+			if (nextGearAction == "Step 2") {
+				gearServo.setAngle(gearAngleMax);
+				nextGearActionTime = System.currentTimeMillis() + gearStep2Time;
+				nextGearAction = "Step 3";
+			}
+			if (nextGearAction == "Step 3") {
+				if (System.currentTimeMillis() >= nextGearActionTime) {
+					gearServo.setAngle(gearAngleMin);
+					nextGearActionTime = System.currentTimeMillis() + gearStep2Time;
+					nextGearAction = "Step 4";
+				}
+			}
+			if (nextGearAction == "Step 4") {
+				if (!gearButton) {
+					nextGearAction = "Step 1";
+				}
+			} 	
 	    }
 	    
 	    /**
