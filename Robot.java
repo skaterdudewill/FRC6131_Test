@@ -59,6 +59,10 @@ import java.lang.*;
 		int cameraYMin = 0;
 		int cameraXMax = 170;
 		int cameraXMin = 0;
+		int cameraXCenter = 90;
+		int cameraYCenter = 90;
+		int cameraCenterController = 9;
+		boolean cameraCenterButton = false;
 		
 		// 
 		int cameraXMultiplier = 2;
@@ -155,10 +159,10 @@ import java.lang.*;
 	    	myRobot = new RobotDrive(driveLeftPWM, driveRightPWM);
 	    	stick = new Joystick(driveJoystick);
 	    	
-	    	cameraYAngle = 90;
+	    	cameraYAngle = cameraYCenter;
 	    	cameraYServo.setAngle(cameraYAngle);
 	    	
-	    	cameraXAngle = 90;
+	    	cameraXAngle = cameraXCenter;
 	    	cameraXServo.setAngle(cameraXAngle);
 	    	
 	    	gearAngle = gearAngleMin;
@@ -315,40 +319,50 @@ import java.lang.*;
 	    		trayButtonStillPressed = false;
 	    	}
 	    	
-	    	// Grab Camera Joystick Values
-	        double camerajsy= (stick.getRawAxis(cameraYAxis));
-	        SmartDashboard.putNumber("Joystick Value", camerajsy);
-	    	if (camerajsy > 0.5) {
-	    		// Move the camera up
-	    		cameraYAngle += cameraYMultiplier;
-	    		if (cameraYAngle > cameraYMax) {
-	    			cameraYAngle = cameraYMax;
-	    		}
+	    	// read camera center button
+	    	cameraCenterButton = stick.getRawButton(cameraCenterController);
+	    	if(cameraCenterButton) {
+	    		cameraYAngle = cameraYCenter;
+	    		cameraXAngle = cameraXCenter;
 	    		cameraYServo.setAngle(cameraYAngle);
-	    	} else if (camerajsy < -0.5) {
-	    		// Move the camera up
-	    		cameraYAngle -= cameraYMultiplier;
-	    		if (cameraYAngle < cameraYMin) {
-	    			cameraYAngle = cameraYMin;
-	    		}
-	    		cameraYServo.setAngle(cameraYAngle);
-	    	}
+	    		cameraXServo.setAngle(cameraXAngle);
 	    	
-	        double camerajsx = (stick.getRawAxis(cameraXAxis));	    
-	    	if (camerajsx > 0.5) {
-	    		// Move the camera up
-	    		cameraXAngle += cameraXMultiplier;
-	    		if (cameraXAngle > cameraXMax) {
-	    			cameraXAngle = cameraXMax;
-	    		}
-	    		cameraXServo.setAngle(cameraXAngle);
-	    	} else if (camerajsx < -0.5) {
-	    		// Move the camera up
-	    		cameraXAngle -= cameraXMultiplier;
-	    		if (cameraXAngle < cameraXMin) {
-	    			cameraXAngle = cameraXMin;
-	    		}
-	    		cameraXServo.setAngle(cameraXAngle);
+	    	} else {
+		    	// Grab Camera Joystick Values
+		        double camerajsy= (stick.getRawAxis(cameraYAxis));
+		        SmartDashboard.putNumber("Joystick Value", camerajsy);
+		    	if (camerajsy > 0.5) { 
+		    		// Move the camera up
+		    		cameraYAngle += cameraYMultiplier;
+		    		if (cameraYAngle > cameraYMax) {
+		    			cameraYAngle = cameraYMax;
+		    		}
+		    		cameraYServo.setAngle(cameraYAngle);
+		    	} else if (camerajsy < -0.5) {
+		    		// Move the camera up
+		    		cameraYAngle -= cameraYMultiplier;
+		    		if (cameraYAngle < cameraYMin) {
+		    			cameraYAngle = cameraYMin;
+		    		}
+		    		cameraYServo.setAngle(cameraYAngle);
+		    	}
+		    	
+		        double camerajsx = (stick.getRawAxis(cameraXAxis));	    
+		    	if (camerajsx > 0.5) {
+		    		// Move the camera up
+		    		cameraXAngle += cameraXMultiplier;
+		    		if (cameraXAngle > cameraXMax) {
+		    			cameraXAngle = cameraXMax;
+		    		}
+		    		cameraXServo.setAngle(cameraXAngle);
+		    	} else if (camerajsx < -0.5) {
+		    		// Move the camera up
+		    		cameraXAngle -= cameraXMultiplier;
+		    		if (cameraXAngle < cameraXMin) {
+		    			cameraXAngle = cameraXMin;
+		    		}
+		    		cameraXServo.setAngle(cameraXAngle);
+		    	}
 	    	}
 	       
 	    	// Right joystick drive
