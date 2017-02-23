@@ -8,8 +8,9 @@ package org.usfirst.frc.team6131.robot;
 	import edu.wpi.first.wpilibj.SpeedController;
 	import edu.wpi.first.wpilibj.Talon;
 	import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-	import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-	import java.lang.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.lang.*;
 	import edu.wpi.first.wpilibj.CameraServer;
 	import edu.wpi.first.wpilibj.SampleRobot;
 	import edu.wpi.first.wpilibj.Servo;
@@ -27,8 +28,10 @@ package org.usfirst.frc.team6131.robot;
 		// setup the main drive variables
 	
 		// which PWMs are the drive motors connected to?
-		int driveLeftPWM=1;
-		int driveRightPWM=0;
+		int driveLeftOnePWM=0;
+		int driveLeftTwoPWM=1;
+		int driveRightOnePWM=2;
+		int driveRightTwoPWM=3;
 		
 		// which joystick will drive the robot?
 		int driveJoystick=0;
@@ -42,8 +45,8 @@ package org.usfirst.frc.team6131.robot;
 		int cameraXAxis=0;
 		
 		// Camera PWMS
-		int cameraYPWM = 3;
-		int cameraXPWM = 4;
+		int cameraYPWM = 4;
+		int cameraXPWM = 5;
 		
 		// Camera Servo
 		Servo cameraYServo = new Servo(cameraYPWM);
@@ -82,16 +85,16 @@ package org.usfirst.frc.team6131.robot;
 	
 		// how slow/fast should the robot be able to drive?
 		double minDriveMultiplier=0.4;
-		double maxDriveMultiplier=1.0;
+		double maxDriveMultiplier=0.8;
 		
 		// PWM for the limit switch motor
 		int trayMotorPWM;
 		
 		// Buttons for tray motors
-    		boolean trayButtonUp = false;
-        	boolean trayButtonDown = false;
-      		int trayButtonUpController = 2;
-      		int trayButtonDownController = 3;
+    	boolean trayButtonUp = false;
+        boolean trayButtonDown = false;
+        int trayButtonUpController = 2;
+        int trayButtonDownController = 3;
 		
 		// Robot drive for the limit switch motor;
 		private SpeedController trayMotor;
@@ -117,7 +120,7 @@ package org.usfirst.frc.team6131.robot;
 		long nextGearActionTime;
 		int gearButtonController = 1;
 		boolean gearButton = false;
-		int gearPWM = 5;
+		int gearPWM = 6;
 		Servo gearServo = new Servo(gearPWM);
 		int gearAngle;
 		int gearAngleMin = 0;
@@ -129,6 +132,10 @@ package org.usfirst.frc.team6131.robot;
 		
 		// Setting up tray button re-press tracker
 		boolean trayButtonStillPressed;
+		
+		// Setup a variable to help prevent flipping over on fast direction changes
+		long timeSinceFastForward=0;
+		long timeSinceFastReverse=0;
 		
 		// Set up tray motor speed
 		double trayMotorUpSpeed;
@@ -151,11 +158,10 @@ package org.usfirst.frc.team6131.robot;
 
 	    	
 	    	// setup pwm for limit switch motor
-	    	trayMotorPWM = 2;
-	    	
+	    	trayMotorPWM = 7;
 	    	
 	    	trayMotor = new Spark(trayMotorPWM);
-	    	myRobot = new RobotDrive(driveLeftPWM, driveRightPWM);
+	    	myRobot = new RobotDrive(driveLeftOnePWM, driveLeftTwoPWM, driveRightOnePWM, driveRightTwoPWM);
 	    	stick = new Joystick(driveJoystick);
 	    	
 	    	cameraYAngle = cameraYCenter;
@@ -183,7 +189,7 @@ package org.usfirst.frc.team6131.robot;
 	    public void autonomousPeriodic() {
 			if (nextAutoAction == "Step 1") {
 				if (System.currentTimeMillis() < nextActionTime) {
-					myRobot.drive(-1.0, 0.0);
+					myRobot.drive(0.5, 0.0);
 				} else {
 					nextAutoAction = "Step 2";
 					nextActionTime = System.currentTimeMillis() + 2000;
@@ -192,7 +198,7 @@ package org.usfirst.frc.team6131.robot;
 			
 			if (nextAutoAction == "Step 2") {
 				if (System.currentTimeMillis() < nextActionTime) {
-					myRobot.drive(0.0, 0.0);
+					myRobot.drive(-0.5, 0.0);
 				} else {
 					nextAutoAction = "Step 3";
 					nextActionTime = System.currentTimeMillis() + 2000;
@@ -200,10 +206,10 @@ package org.usfirst.frc.team6131.robot;
 			}
 			if (nextAutoAction == "Step 3") {
 				if (System.currentTimeMillis() < nextActionTime) {
-					myRobot.drive(1.0, 0.0);
+					myRobot.drive(0.0, 0.0);
 				} else {
 					nextAutoAction = "Step 4";
-					nextActionTime = System.currentTimeMillis() + 2000;
+					nextActionTime = System.currentTimeMillis();
 				}
 			}
 			if (nextAutoAction == "Step 4") {
@@ -211,7 +217,7 @@ package org.usfirst.frc.team6131.robot;
 					myRobot.drive(0.0, 0.0);
 				} else {
 					nextAutoAction = "Step 5";
-						nextActionTime = System.currentTimeMillis() + 2000;
+						nextActionTime = System.currentTimeMillis();
 					}
 				}
 			}
@@ -330,6 +336,7 @@ package org.usfirst.frc.team6131.robot;
 		    	// Grab Camera Joystick Values
 		        double camerajsy= (stick.getRawAxis(cameraYAxis));
 		        SmartDashboard.putNumber("Joystick Value", camerajsy);
+		        SmartDashboard.putNumber("Drive Multiplier", driveMultiplier);
 		    	if (camerajsy > 0.5) { 
 		    		// Move the camera up
 		    		cameraYAngle += cameraYMultiplier;
@@ -367,7 +374,23 @@ package org.usfirst.frc.team6131.robot;
 	    	// Right joystick drive
 	    	double drivey= (stick.getRawAxis(driveYAxis) * driveYAxisSwap) * driveMultiplier;
 	        double drivex = (stick.getRawAxis(driveXAxis) * driveYAxisSwap) * driveMultiplier;
-	    	myRobot.arcadeDrive(drivey, drivex, true);
+	        
+	    	if (drivey >= 0.6){
+	    		timeSinceFastForward=System.currentTimeMillis();
+	    	} else if (drivey <= -0.6){
+	    		timeSinceFastReverse=System.currentTimeMillis();
+	    	}
+	    	
+	    	if (drivey < 0 && timeSinceFastForward+1000 >= System.currentTimeMillis()){
+	    		// trying to go backward too soon. slow it down mister.
+	    		drivey=0;
+	    	}
+	    	if (drivey > 0 && timeSinceFastReverse+1000 >= System.currentTimeMillis()){
+	    		// trying to go backward too soon. slow it down mister.
+	    		drivey=0;
+	    	}
+	        
+	        myRobot.arcadeDrive(drivey, drivex, true);
 	    	
 	    	// perform gear actions
 	    	gearButton = stick.getRawButton(gearButtonController);
