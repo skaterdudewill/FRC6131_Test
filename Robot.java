@@ -8,9 +8,8 @@ package org.usfirst.frc.team6131.robot;
 	import edu.wpi.first.wpilibj.SpeedController;
 	import edu.wpi.first.wpilibj.Talon;
 	import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.lang.*;
+	import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+	import java.lang.*;
 	import edu.wpi.first.wpilibj.CameraServer;
 	import edu.wpi.first.wpilibj.SampleRobot;
 	import edu.wpi.first.wpilibj.Servo;
