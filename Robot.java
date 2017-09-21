@@ -86,17 +86,19 @@ package org.usfirst.frc.team6131.robot;
 		double minDriveMultiplier=0.4;
 		double maxDriveMultiplier=0.8;
 		
-		// PWM for the limit switch motor
-		int trayMotorPWM;
+		// PWM for the climber Motor
+		int climberMotorOnePWM;
+		int climberMotorTwoPWM;
 		
 		// Buttons for tray motors
-    	boolean trayButtonUp = false;
-        boolean trayButtonDown = false;
-        int trayButtonUpController = 2;
-        int trayButtonDownController = 3;
+    	boolean climberButtonUp = false;
+        boolean climberButtonDown = false;
+        int climberButtonUpController = 2;
+        int climberButtonDownController = 3;
 		
 		// Robot drive for the limit switch motor;
-		private SpeedController trayMotor;
+		private SpeedController climberMotorOne;
+		private SpeedController climberMotorTwo;
 		
 		
 		RobotDrive myRobot;
@@ -130,15 +132,15 @@ package org.usfirst.frc.team6131.robot;
 		CameraServer server;
 		
 		// Setting up tray button re-press tracker
-		boolean trayButtonStillPressed;
+		boolean climberMotorButtonStillPressed;
 		
 		// Setup a variable to help prevent flipping over on fast direction changes
 		long timeSinceFastForward=0;
 		long timeSinceFastReverse=0;
 		
 		// Set up tray motor speed
-		double trayMotorUpSpeed;
-		double trayMotorDownSpeed;
+		double climberMotorUpSpeed;
+		double climberMotorDownSpeed;
 	    /**
 	     * This function is run when the robot is first started up and should be
 	     * used for any initialization code.
@@ -152,14 +154,16 @@ package org.usfirst.frc.team6131.robot;
 	    	server.setSize(640);
 	    	
 	    	// setup tray limit switches
-	    	trayLimitUp = new DigitalInput(0);
-	    	trayLimitDown = new DigitalInput(1);
+	    	//trayLimitUp = new DigitalInput(0);
+	    	//trayLimitDown = new DigitalInput(1);
 
 	    	
 	    	// setup pwm for limit switch motor
-	    	trayMotorPWM = 7;
-	    	
-	    	trayMotor = new Spark(trayMotorPWM);
+	    	climberMotorOnePWM = 7;
+	    	climberMotorTwoPWM = 8;
+	    	climberMotorOne = new Spark(climberMotorOnePWM);
+   		climberMotorTwo = new Spark(climberMotorTwoPWM);
+		
 	    	myRobot = new RobotDrive(driveLeftOnePWM, driveLeftTwoPWM, driveRightOnePWM, driveRightTwoPWM);
 	    	stick = new Joystick(driveJoystick);
 	    	
@@ -228,8 +232,8 @@ package org.usfirst.frc.team6131.robot;
 	    public void teleopInit(){
 	        driveMultiplier=minDriveMultiplier;
 	        multUpButtonState=false;
-	        trayMotorUpSpeed = 1.0;
-	        trayMotorDownSpeed = 0.7;
+	        climberMotorUpSpeed = 0.7;
+	        climberMotorDownSpeed = 0.7;
 	        // Gear Servo Setup
 	        gearMillisCounter = System.currentTimeMillis();
 	    	nextGearAction = "Step 1";
@@ -242,8 +246,8 @@ package org.usfirst.frc.team6131.robot;
 	     */
 	    public void teleopPeriodic() {
 	    	// setup tray motor buttons
-	    	trayButtonUp = stick.getRawButton(trayButtonDownController);
-	    	trayButtonDown = stick.getRawButton(trayButtonUpController);
+	    	climberButtonUp = stick.getRawButton(climberMotorButtonDownController);
+	    	climberButtonDown = stick.getRawButton(climberMotorButtonUpController);
 	    	
 	    	// get values for the drive multiplier up/down buttons
 	    	boolean multUpValue=stick.getRawButton(multUpButton);
@@ -290,12 +294,12 @@ package org.usfirst.frc.team6131.robot;
 	    	if (driveMultiplier > maxDriveMultiplier) driveMultiplier = maxDriveMultiplier;
 	    	if (driveMultiplier < minDriveMultiplier) driveMultiplier = minDriveMultiplier;
 
-	    	// see if the tray limit switches are closed
+	    	/* see if the tray limit switches are closed
 	    	if (trayLimitUp.get()){
 	    		trayLimitUpPressed=false;
 	    	} else {
 	    		trayLimitUpPressed=true;
-	    		trayButtonStillPressed = true;
+	    		climberMotorButtonStillPressed = true;
 	    	}
 	    	
 	    	if (trayLimitDown.get()){
@@ -303,24 +307,27 @@ package org.usfirst.frc.team6131.robot;
 	    	} else {
 	    		trayLimitDownPressed=true;
 	    	}
-	    	
-	    	if (trayButtonUp == true || trayButtonDown == true) {
+	    	*/
+	    	if (climberMotorButtonUp == true || climberMotorButtonDown == true) {
 	    		// a button is pushed
-	    		if (trayButtonUp == true && trayLimitUpPressed == false) {
+	    		if (climberMotorButtonUp == true) {
 	    			//Safe to go up
-	    			if (trayButtonStillPressed == true ) {
+	    			if (climberButtonStillPressed == true ) {
 	    				// but don't go up until the button is re-pressed
 	    			} else {
-	    				trayMotor.set(trayMotorUpSpeed);
+	    				climberMotorOne.set(climberMotorUpSpeed);
+					climberMotorTwo.set(climberMotorUpSpeed);
 	    			}
-	    		} else if(trayButtonDown == true && trayLimitDownPressed==false) {
-	    			trayMotor.set(-1 * trayMotorDownSpeed);
+	    		} else if(climberMotorButtonDown == true) {
+	    			climberMotorOne.set(climberMotorDownSpeed);
+				climberMotorTwo.set(climberMotorDownSpeed);
 	    		} else {
-	    			trayMotor.set(0.0);
+	    			climberMotorOne.set(0.0);
+				climberMotorTwo.set(0.0);
 	    		}
 	    	} else {
-	    		trayMotor.set(0.0);
-	    		trayButtonStillPressed = false;
+	    		climberMotor.set(0.0);
+	    		climberMotorButtonStillPressed = false;
 	    	}
 	    	
 	    	// read camera center button
