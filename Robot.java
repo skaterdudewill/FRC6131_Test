@@ -91,10 +91,10 @@ package org.usfirst.frc.team6131.robot;
 		int climberMotorTwoPWM;
 		
 		// Buttons for tray motors
-    	boolean climberButtonUp = false;
-        boolean climberButtonDown = false;
-        int climberButtonUpController = 2;
-        int climberButtonDownController = 3;
+    		boolean climberButtonUp = false;
+        	boolean climberButtonDown = false;
+        	int climberButtonUpController = 2;
+        	int climberButtonDownController = 3;
 		
 		// Robot drive for the limit switch motor;
 		private SpeedController climberMotorOne;
@@ -132,7 +132,7 @@ package org.usfirst.frc.team6131.robot;
 		CameraServer server;
 		
 		// Setting up tray button re-press tracker
-		boolean climberMotorButtonStillPressed;
+		boolean climberButtonStillPressed;
 		
 		// Setup a variable to help prevent flipping over on fast direction changes
 		long timeSinceFastForward=0;
@@ -246,8 +246,8 @@ package org.usfirst.frc.team6131.robot;
 	     */
 	    public void teleopPeriodic() {
 	    	// setup tray motor buttons
-	    	climberButtonUp = stick.getRawButton(climberMotorButtonDownController);
-	    	climberButtonDown = stick.getRawButton(climberMotorButtonUpController);
+	    	climberButtonUp = stick.getRawButton(climberButtonDownController);
+	    	climberButtonDown = stick.getRawButton(climberButtonUpController);
 	    	
 	    	// get values for the drive multiplier up/down buttons
 	    	boolean multUpValue=stick.getRawButton(multUpButton);
@@ -308,9 +308,9 @@ package org.usfirst.frc.team6131.robot;
 	    		trayLimitDownPressed=true;
 	    	}
 	    	*/
-	    	if (climberMotorButtonUp == true || climberMotorButtonDown == true) {
+	    	if (climberButtonUp == true || climberButtonDown == true) {
 	    		// a button is pushed
-	    		if (climberMotorButtonUp == true) {
+	    		if (climberButtonUp == true) {
 	    			//Safe to go up
 	    			if (climberButtonStillPressed == true ) {
 	    				// but don't go up until the button is re-pressed
@@ -319,15 +319,16 @@ package org.usfirst.frc.team6131.robot;
 					climberMotorTwo.set(climberMotorUpSpeed);
 	    			}
 	    		} else if(climberMotorButtonDown == true) {
-	    			climberMotorOne.set(climberMotorDownSpeed);
-				climberMotorTwo.set(climberMotorDownSpeed);
+	    			climberMotorOne.set(climberMotorDownSpeed * -1);
+				climberMotorTwo.set(climberMotorDownSpeed * -1);
 	    		} else {
 	    			climberMotorOne.set(0.0);
 				climberMotorTwo.set(0.0);
 	    		}
 	    	} else {
-	    		climberMotor.set(0.0);
-	    		climberMotorButtonStillPressed = false;
+	    		climberMotorOne.set(0.0);
+			climberMotorTwo.set(0.0);
+	    		climberButtonStillPressed = false;
 	    	}
 	    	
 	    	// read camera center button
